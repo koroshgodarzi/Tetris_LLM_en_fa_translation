@@ -16,7 +16,7 @@ tokenizer = AutoTokenizer.from_pretrained(model_path)
 # ---------------------
 # FastAPI App
 # ---------------------
-app = FastAPI(title="PersianMind Translation API")
+app = FastAPI(title="Tetris Translation API")
 
 # Template for prompt
 TEMPLATE = "{context}\nYou: {prompt}\nPersianMind: "
