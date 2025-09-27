@@ -8,7 +8,7 @@ Our goal is to explore and implement all major steps of a traditional Neural Mac
 * 🧹 **Data Preprocessing** — cleaning, normalizing, and tokenizing parallel corpora for Persian and English.
 * 📝 **Linguistic Feature Extraction** — applying POS tagging and Named Entity Recognition (NER) to analyze their impact on translation quality.
 * 🔡 **Subword Tokenization & Embedding** — using modern subword models (e.g., SentencePiece/BPE) and embedding techniques.
-* 🧠 **Model Design & Training** — implementing a Seq2Seq model with LSTM encoder–decoder and attention, then training it on large-scale parallel datasets such as **TEP** and **MIZAN**.
+* 🧠 **Model Design & Training** — implementing a Seq2Seq model with LSTM encoder–decoder and attention, then training it on large-scale parallel datasets such as **OpenSubtitles**.
 * 📊 **Evaluation & Analysis** — measuring performance with BLEU, chrF, and TER metrics, and conducting qualitative error analysis.
 
 This repository contains:
@@ -17,3 +17,4 @@ This repository contains:
 * 🧰 Preprocessing and model training scripts
 * 📈 Experiment logs and evaluation results
 * 📄 A detailed project report.
+
