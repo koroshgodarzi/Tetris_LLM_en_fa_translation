@@ -1,3 +1,4 @@
+src/finetuned_model/
 src/farsi_partly.txt
 src/english_partly.txt
 src/en-fa.txt.zip

@@ -113,7 +113,7 @@ class Translator:
 
         return translated_text
 
-normalizer = Normalize(nlp_en, hazm_normalizer, inference=False)
+normalizer = Normalize(nlp_en, hazm_normalizer, inference=True)
 tokenizer = AutoTokenizer.from_pretrained("alirezamsh/small100", tgt_lang="fa")
 translator = Translator(get_model(), tokenizer, normalizer, device)
 
