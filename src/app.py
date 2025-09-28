@@ -13,6 +13,7 @@ from peft import prepare_model_for_kbit_training, LoraConfig, get_peft_model
 # ---------------------
 # Load Model and Tokenizer
 # ---------------------
+HF_TOKEN = os.environ.get("HF_TOKEN")
 try:
     nlp_en = spacy.load("en_core_web_sm")
 except OSError:
@@ -36,7 +37,8 @@ def get_model():
                 repo_id=repo_id,
                 filename=filename,
                 local_dir=local_dir,
-                local_dir_use_symlinks=False
+                local_dir_use_symlinks=False,
+                token=HF_TOKEN
             )
             print(f"Downloaded '{filename}' from '{repo_id}' to '{downloaded_file_path}'")
 
@@ -44,8 +46,7 @@ def get_model():
             print(f"Error downloading file: {e}")
             print(f"Please check if the file '{filename}' exists in the repository '{repo_id}' on the Hugging Face Hub.")
 
-
-    model = M2M100ForConditionalGeneration.from_pretrained("alirezamsh/small100")
+    model = M2M100ForConditionalGeneration.from_pretrained("alirezamsh/small100", token=HF_TOKEN)
     model = prepare_model_for_kbit_training(model)
 
     proj_candidates = set()
@@ -72,7 +73,7 @@ def get_model():
     )
 
     model = get_peft_model(model, lora_config)
-    model.load_state_dict(torch.load(filename, map_location=torch.device(device)))
+    model.load_state_dict(torch.load(os.path.join(local_dir , filename), map_location=torch.device(device)))
     return model
 
 
