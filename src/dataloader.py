@@ -74,12 +74,16 @@ class Normalize:
     """
     A transform class to normalize and clean English and Farsi texts.
     """
-    def __init__(self, nlp_en_model, hazm_normalizer_obj):
+    def __init__(self, nlp_en_model, hazm_normalizer_obj, inference=False):
         self.nlp_en = nlp_en_model
         self.hazm_normalizer = hazm_normalizer_obj
+        self.inference = inference
 
     def __call__(self, sample):
-        en_text, fa_text = sample['en_text'], sample['fa_text']
+        if self.inference:
+            en_text = sample['en_text']
+        else:
+            en_text, fa_text = sample['en_text'], sample['fa_text']
 
         # --- English processing (lowercase + remove punctuation + tokenize with spaCy) ---
         en_text = en_text.lower()
@@ -87,12 +91,14 @@ class Normalize:
         en_text = " ".join([tok.text for tok in self.nlp_en(en_text)])
 
         # --- Farsi processing (Hazm + regex cleanup) ---
-        fa_text = self.hazm_normalizer.normalize(fa_text)
-        fa_text = re.sub(r'[^\w\s\u0600-\u06FF]', '', fa_text)  # keep only Persian + spaces
-        fa_text = re.sub(r'[–.؟٫‍٬،‍:‍؛‍‍]', '', fa_text)  # remove extra Persian punctuations
-        fa_text = fa_text.strip()
+        if not self.inference:
+            fa_text = self.hazm_normalizer.normalize(fa_text)
+            fa_text = re.sub(r'[^\w\s\u0600-\u06FF]', '', fa_text)  # keep only Persian + spaces
+            fa_text = re.sub(r'[–.؟٫‍٬،‍:‍؛‍‍]', '', fa_text)  # remove extra Persian punctuations
+            fa_text = fa_text.strip()
 
-        return {'en_text': en_text, 'fa_text': fa_text}
+            return {'en_text': en_text, 'fa_text': fa_text}
+        return {'en_text': en_text}
 
 
 class PairedTextDataset(Dataset):

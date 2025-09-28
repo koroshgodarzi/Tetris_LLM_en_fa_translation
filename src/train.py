@@ -9,12 +9,22 @@ import torch.nn.utils as nn_utils
 from tqdm import tqdm
 import os
 from dataloader import PairedTextDataset, Normalize, download_opus_subtitles
-# import bitsandbytes
+import re
 
 
 if __name__ == '__main__':
+    try:
+        nlp_en = spacy.load("en_core_web_sm")
+    except OSError:
+        import spacy.cli
+        spacy.cli.download("en_core_web_sm")
+        nlp_en = spacy.load("en_core_web_sm")
+
+    hazm_normalizer = hazm.Normalizer()
+
     device = "cuda" if torch.cuda.is_available() else "cpu"
     num_epochs = 10
+
     output = os.path.join('.', 'model_weights')
     if not os.path.exists(output):
         os.makedirs(output)
@@ -37,7 +47,7 @@ if __name__ == '__main__':
         os.path.join('english_partly.txt'),
         os.path.join('farsi_partly.txt'),
         tokenizer,
-        transform=Normalize(),
+        transform=Normalize(nlp_en, hazm_normalizer),
         max_length=64,
     )
 
