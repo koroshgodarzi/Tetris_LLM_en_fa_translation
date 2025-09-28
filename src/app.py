@@ -28,7 +28,7 @@ def get_model():
     repo_id = "alizali/Translate_Tetris"
     filename = "final.pt" 
 
-    local_dir = "."
+    local_dir = "./finetuned_model"
     if not os.path.exists('filename'):
         try:
             # Download the file
