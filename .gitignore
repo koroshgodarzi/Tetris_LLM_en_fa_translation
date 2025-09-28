@@ -1,3 +1,5 @@
+.env
+test*
 src/finetuned_model/
 src/farsi_partly.txt
 src/english_partly.txt
