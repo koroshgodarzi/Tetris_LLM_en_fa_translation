@@ -1,5 +1,5 @@
 from torch.utils.data import random_split, DataLoader
-from transformers import AutoModelForCausalLM, get_scheduler, AutoTokenizer
+from transformers import M2M100ForConditionalGeneration, get_scheduler, AutoTokenizer
 import spacy
 import hazm
 import torch
@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     hazm_normalizer = hazm.Normalizer()
 
-    tokenizer = AutoTokenizer.from_pretrained("universitytehran/PersianMind-v1.0")
+    tokenizer = AutoTokenizer.from_pretrained("alirezamsh/small100", tgt_lang="fa")
 
     dataset = PairedTextDataset(
         os.path.join('english_partly.txt'),
@@ -48,29 +48,34 @@ if __name__ == '__main__':
     train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
     val_dataloader = DataLoader(val_dataset, batch_size=32)
 
-    model = AutoModelForCausalLM.from_pretrained(
-        "universitytehran/PersianMind-v1.0",
-        device_map="auto",
-        load_in_8bit=True,
-        low_cpu_mem_usage=True
-    )
+    model = M2M100ForConditionalGeneration.from_pretrained("alirezamsh/small100")
 
-    # Step 1: Prepare model for k-bit training (adds gradient checkpointing, casts norms to fp32, etc.)
     model = prepare_model_for_kbit_training(model)
 
-    # Step 2: Configure LoRA
+    proj_candidates = set()
+    pattern = re.compile(r'(?:^|\.)(q_proj|k_proj|v_proj|out_proj|o_proj|gate_proj|up_proj|down_proj)(?:$|\.)')
+
+    for name, _ in model.named_modules():
+        m = pattern.search(name)
+        if m:
+            proj_candidates.add(m.group(1))
+
+    if len(proj_candidates) == 0:
+        proj_candidates = {"q_proj", "k_proj", "v_proj", "out_proj"}
+
+    target_modules = sorted(list(proj_candidates))
+    print("Using LoRA target modules:", target_modules)
+
     lora_config = LoraConfig(
-        r=8,  # rank of LoRA matrices
-        lora_alpha=32,  # scaling factor
-        target_modules=["q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+        r=8,
+        lora_alpha=32,
+        target_modules=target_modules,
         lora_dropout=0.05,
         bias="none",
-        task_type="CAUSAL_LM"
+        task_type="SEQ_2_SEQ_LM"
     )
 
     model = get_peft_model(model, lora_config)
-
-    model.print_trainable_parameters()
 
     optimizer = AdamW(
         filter(lambda p: p.requires_grad, model.parameters()),
