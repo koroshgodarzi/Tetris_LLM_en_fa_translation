@@ -9,10 +9,11 @@ import re
 import os
 from huggingface_hub import hf_hub_download
 from peft import prepare_model_for_kbit_training, LoraConfig, get_peft_model
-
+from dotenv import load_dotenv
 # ---------------------
 # Load Model and Tokenizer
 # ---------------------
+load_dotenv()
 HF_TOKEN = os.environ.get("HF_TOKEN")
 try:
     nlp_en = spacy.load("en_core_web_sm")
