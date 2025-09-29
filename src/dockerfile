@@ -20,7 +20,7 @@ COPY . /app
 
 RUN python -m spacy download en_core_web_sm || true
 
-ENV HF_TOKEN=
+#ENV HF_TOKEN=
 
 EXPOSE 8000
 
